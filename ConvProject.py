@@ -1,7 +1,6 @@
 import json
 from urllib.request import urlopen
-import tkinter as tk
-from tkinter import messagebox
+from tkinter import Tk, Label, Entry, Button, messagebox, StringVar, Radiobutton
 
 
 def get_usd_to_uah_rate():
@@ -13,30 +12,60 @@ def get_usd_to_uah_rate():
                 if currency['cc'] == 'USD':
                     return currency['rate']
     except Exception as e:
-        print(f"Error fetching exchange rate: {e}")
+        messagebox.showerror("Error", f"Fetching exchange rate: {e}")
         return None
+
+
 def conv_to_uah(rate, count_of_usd):
-    conv_from_usd_to_uah = int(float(count_of_usd)*rate)
+    conv_from_usd_to_uah = int(float(count_of_usd) * rate)
     rounded_1 = round(conv_from_usd_to_uah, 2)
-    print(rounded_1)
+    return rounded_1
+
+
 def conv_to_usd(rate, count_of_uah):
-    conv_from_uah_to_usd = (float(count_of_uah)/rate)
+    conv_from_uah_to_usd = (float(count_of_uah) / rate)
     rounded_2 = round(conv_from_uah_to_usd, 2)
-    print (rounded_2)
-def convertor():
-        rate_of_usd = get_usd_to_uah_rate()
-        print ('Welcome to the course convertor grn to dollars and dollars to grn')
-        to_uah_or_to_usd_or_course = input(str('Type you want to convert to uah/usd or you just to know the course. Type "off" to off the course convertor'))
-        if to_uah_or_to_usd_or_course == 'to uah':
-            usd = input('Type here how much dollars u want to convert to grn')
-            uah = 0
-            converted_to_uah = conv_to_uah(rate_of_usd, usd)
-        elif to_uah_or_to_usd_or_course == 'off':
-            return None
-        elif to_uah_or_to_usd_or_course == 'course':
-            print(f'The NBU information says that the course now is {rate_of_usd}')
+    return rounded_2
+
+
+def interface():
+    def convert():
+
+        rate = get_usd_to_uah_rate()
+        if rate is None:
+            return
+
+
+        amount = entry.get()
+        conversion = conversion_type.get()
+
+        if conversion == "to_uah":
+            result = conv_to_uah(rate, amount)
+            if result is not None:
+                messagebox.showinfo("Result", f"{amount} USD = {result} UAH")
+        elif conversion == "to_usd":
+            result = conv_to_usd(rate, amount)
+            if result is not None:
+                messagebox.showinfo("Result", f"{amount} UAH = {result} USD")
         else:
-            uah = input('Type here how much grn u want to convert to dollars')
-            usd = 0
-            converted_to_usd = conv_to_usd(rate_of_usd, uah)
-convertor()
+            messagebox.showinfo("Choose", "Choose a conversion type!")
+
+
+    root = Tk()
+    root.title("CURRENCY CONVERTOR")
+    root.configure(bg="#FFFFFF")
+    root.geometry("400x250")
+
+    Label(root, bg="#d5e3df", text="Enter:", font="Arial").pack(pady=10)
+    entry = Entry(root, width=20)
+    entry.pack(pady=5)
+
+    conversion_type = StringVar(value="to_uah")
+    Radiobutton(root, text="USD → UAH", font="Arial", variable=conversion_type, value="to_uah").pack(anchor="w", padx=50)
+    Radiobutton(root, text="UAH → USD", font="Arial", variable=conversion_type, value="to_usd").pack(anchor="w", padx=50)
+
+    Button(root, bg="#95baae",text="Convert", font="Arial", command=convert).pack(pady=20)
+
+    root.mainloop()
+
+interface()
